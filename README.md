@@ -51,7 +51,7 @@ flowchart LR
     S -->|publish Domain Event| B
     B --> A[AggregationService]
     A -->|project/update| R[(Aggregated Read Model)]
-    R -->|@Query| V
+    R -->|"@Query"| V
 ```
 
 ## Key Components

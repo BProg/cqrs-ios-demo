@@ -2,6 +2,10 @@
 
 This project is a lightweight CQRS demo in SwiftUI showing strict separation between writes (commands) and reads (query model).
 
+It is designed as a full app lifecycle reference: command intake, domain decisioning, event publication, projection updates, and reactive UI query refresh, all in one flow.
+
+At its core, this is a true event-driven architecture where business state changes are communicated through events, and the read side converges through true eventual consistency.
+
 ## Main Architectural Focus
 
 - The UI does not mutate domain state directly.
@@ -68,3 +72,5 @@ This design keeps the UI simple and reactive while enforcing a clean write/read 
 - business changes are observable (events)
 - reads are optimized for display (aggregated projection)
 - SwiftUI stays declarative and auto-updating through `@Query`
+
+From a product perspective, this gives you a practical blueprint for real-world apps that need resilient workflows, independently scalable read/write concerns, and transparent consistency behavior over time.

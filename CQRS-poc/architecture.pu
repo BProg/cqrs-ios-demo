@@ -1,0 +1,102 @@
+@startuml
+
+' This is for SwiftUI App
+
+enum Command {
+    ConsiderProduct
+    UnconsiderProduct
+}
+
+enum Event {
+    ProductConsidered
+    ProductUnconsidered
+    
+}
+
+struct Product {
+    id: string
+    name: string
+}
+
+class SwiftDataProductsRepository {
+    - container: SwiftDataContainer
+    + getProducts(): Product[]
+}
+
+class SwiftDataWishlistRepository {
+    - container: SwiftDataContainer
+    + getConsideredProducts(): string[]
+    + add(productId: string): void
+    + remove(productId: string): void
+}
+
+' Uses function inection instead of protocols 
+class WishlistService {
+    - add: AddProductFn
+    - remove: RemoveProductFn
+}
+
+' This is a @Model struct using SwiftData
+struct AggregatedUserProduct<@SwiftData.Model> {
+    id: string
+    name: string
+    inWishlist: boolean
+}
+
+class SwiftDataAggregatedProductsRepository {
+    - container: SwiftDataContainer
+    ' Must replace all the existing products in db with the provided ones
+    + setAggregatedProducts(products: AggregatedUserProduct[]): void
+    ' Must fetch the product with id and update its inWishlist property
+    + updateConsidered(id: string, inWishlist: boolean): void
+}
+
+' Uses function injection
+class AggregationService {
+    - getProducts: GetProductsFn
+    - getConsideredProducts: GetConsideredProductsFn
+    - setAggregatedProducts: SetAggregatedProductsFn
+    - updateAggregatedProduct: UpdateAggregatedProductFn
+
+    ' listens to ProductConsidered, ProductUnconsidered events and updates the aggregated products in the repository accordingly
+    + init(bus: NotificationCenter)
+    ' Fetch products and considered products, aggregate them and save the result in the repository
+    + boot()
+}
+
+class DIContainer {
+    - swiftDataContainer: SwiftDataContainer
+    - swiftDataContainerForViewModels: SwiftDataContainer
+
+    - productsRepository: SwiftDataProductsRepository
+    - wishlistRepository: SwiftDataWishlistRepository
+    - aggregatedProductsRepository: SwiftDataAggregatedProductsRepository
+
+    ' Init does the initialization of the dependencies
+    + init() 
+}
+
+' Calls boot of AggregationService.
+class AppDelegate {
+
+}
+' Will set the view model container in the environment
+class AppMain {
+    - diContainer: DIContainer
+}
+
+struct ProductsListView {
+    ' Display a list of products, uses SwiftData Query
+    - products: [AggregatedUserProduct]
+}
+
+' ViewModel doesn't own the products, the View will auto fetch products using Query
+class ProductsListViewModel {
+}
+
+' Has a button to consider/unconsider a product, the 
+struct ProductCardView {
+    - product: AggregatedUserProduct
+}
+
+@enduml
